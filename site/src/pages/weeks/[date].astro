@@ -1,0 +1,19 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import ChangeReport from '../../components/ChangeReport.astro';
+import { formatDate, getAllChanges, url, type ChangeReport as Report } from '../../lib/data';
+
+// One static page per weekly report, e.g. /weeks/2026-11-16/
+export function getStaticPaths() {
+  return getAllChanges().map((report) => ({ params: { date: report.week }, props: { report } }));
+}
+
+const { report } = Astro.props as { report: Report };
+---
+
+<Layout title={`Week of ${formatDate(report.week)}`} active="archive">
+  <p><a href={url('weeks/')}>← All weeks</a></p>
+  <h1>Week of {formatDate(report.week)}</h1>
+  <p class="muted">{report.total} games were Overwhelmingly Positive this week.</p>
+  <ChangeReport report={report} />
+</Layout>

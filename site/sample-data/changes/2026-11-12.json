@@ -1,0 +1,109 @@
+{
+ "week": "2026-11-12",
+ "previous_week": "2026-11-05",
+ "total": 191,
+ "new_entries": [
+  {
+   "appid": 1145350,
+   "name": "Hades II",
+   "percent_positive": 95,
+   "review_count": 115822,
+   "review_label": "Overwhelmingly Positive",
+   "release_date": "2025-09-25",
+   "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1145350/91ac334a2c137d08968ccc0bc474a02579602100/header.jpg?t=1779901265",
+   "store_url": "https://store.steampowered.com/app/1145350/Hades_II",
+   "price": "$29.99",
+   "is_new_release": false
+  },
+  {
+   "appid": 3070070,
+   "name": "TCG Card Shop Simulator",
+   "percent_positive": 96,
+   "review_count": 48607,
+   "review_label": "Overwhelmingly Positive",
+   "release_date": "2026-09-14",
+   "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/3070070/b4f36532c943011a9f1600c2585ca7065ef5b1bb/header.jpg?t=1793152078",
+   "store_url": "https://store.steampowered.com/app/3070070/TCG_Card_Shop_Simulator",
+   "price": "$19.99",
+   "is_new_release": true
+  },
+  {
+   "appid": 427410,
+   "name": "Abiotic Factor",
+   "percent_positive": 95,
+   "review_count": 43099,
+   "review_label": "Overwhelmingly Positive",
+   "release_date": "2025-07-22",
+   "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/427410/0bccdb269cdbb25c701cd00c3179cc29647e1fb8/header_alt_assets_7.jpg?t=1794245513",
+   "store_url": "https://store.steampowered.com/app/427410/Abiotic_Factor",
+   "price": "$34.99",
+   "is_new_release": false
+  },
+  {
+   "appid": 1062090,
+   "name": "Timberborn",
+   "percent_positive": 96,
+   "review_count": 39272,
+   "review_label": "Overwhelmingly Positive",
+   "release_date": "2026-03-12",
+   "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/1062090/eeb2babf15cbf4ebc175316a5d3e42a060f3d97c/header.jpg?t=1788438437",
+   "store_url": "https://store.steampowered.com/app/1062090/Timberborn",
+   "price": "$34.99",
+   "is_new_release": false
+  },
+  {
+   "appid": 2142790,
+   "name": "Fields of Mistria",
+   "percent_positive": 96,
+   "review_count": 33735,
+   "review_label": "Overwhelmingly Positive",
+   "release_date": "2026-08-05",
+   "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/2142790/f65314989c7779a45a674bcc950092eed32c0b0f/header.jpg?t=1785944891",
+   "store_url": "https://store.steampowered.com/app/2142790/Fields_of_Mistria",
+   "price": "$13.99",
+   "is_new_release": false
+  }
+ ],
+ "dropped": [
+  {
+   "before": {
+    "appid": 730,
+    "name": "Counter-Strike 2",
+    "percent_positive": 95,
+    "review_count": 9900000,
+    "review_label": "Overwhelmingly Positive",
+    "store_url": "https://store.steampowered.com/app/730/"
+   },
+   "now": {
+    "appid": 730,
+    "name": "Counter-Strike 2",
+    "percent_positive": 85,
+    "review_count": 9981430,
+    "review_label": "Very Positive",
+    "release_date": "2012-08-21",
+    "header_image": "https://shared.akamai.steamstatic.com/store_item_assets/steam/apps/730/162664aa5da85f418105350c5d67ca565f6c3713/header.jpg?t=1793054556",
+    "store_url": "https://store.steampowered.com/app/730/CounterStrike_2",
+    "price": "Free"
+   },
+   "reason": {
+    "code": "score_fell",
+    "detail": "Positive reviews fell from 95% to 85% (now rated Very Positive)."
+   }
+  },
+  {
+   "before": {
+    "appid": 999999991,
+    "name": "Example Delisted Game",
+    "percent_positive": 97,
+    "review_count": 812,
+    "review_label": "Overwhelmingly Positive",
+    "store_url": "https://store.steampowered.com/app/999999991/"
+   },
+   "now": null,
+   "reason": {
+    "code": "delisted",
+    "detail": "No longer available on the Steam store (delisted or removed)."
+   }
+  }
+ ]
+}

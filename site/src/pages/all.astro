@@ -1,0 +1,166 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { formatCount, formatDate, getCurrent } from '../lib/data';
+
+const current = getCurrent();
+const games = current?.games ?? [];
+const years = [...new Set(games.map((g) => g.release_date?.slice(0, 4)).filter(Boolean))]
+  .sort()
+  .reverse() as string[];
+---
+
+<Layout title="All Overwhelmingly Positive games" active="all">
+  <h1>All Overwhelmingly Positive games</h1>
+  <p class="muted">
+    {formatCount(games.length)} games{current && <> · updated {formatDate(current.week)}</>}
+  </p>
+
+  <div class="controls">
+    <input id="q" type="search" placeholder="Search by name…" aria-label="Search by name" />
+    <select id="sort" aria-label="Sort by">
+      <option value="reviews">Most reviews</option>
+      <option value="pct">Highest % positive</option>
+      <option value="release">Newest release</option>
+      <option value="name">Name A–Z</option>
+    </select>
+    <select id="year" aria-label="Release year">
+      <option value="">Any year</option>
+      {years.map((y) => <option value={y}>{y}</option>)}
+    </select>
+    <span id="shown" class="muted" aria-live="polite"></span>
+  </div>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Game</th>
+        <th class="num">% positive</th>
+        <th class="num">Reviews</th>
+        <th>Released</th>
+        <th>Price</th>
+      </tr>
+    </thead>
+    <tbody id="rows">
+      {
+        games.map((g) => (
+          <tr
+            data-name={g.name.toLowerCase()}
+            data-pct={g.percent_positive ?? 0}
+            data-reviews={g.review_count ?? 0}
+            data-release={g.release_date ?? ''}
+          >
+            <td>
+              <a href={g.store_url} target="_blank" rel="noopener">
+                {g.name}
+              </a>
+            </td>
+            <td class="num pct">{g.percent_positive}%</td>
+            <td class="num">{formatCount(g.review_count)}</td>
+            <td>{formatDate(g.release_date)}</td>
+            <td class="muted">{g.price ?? '–'}</td>
+          </tr>
+        ))
+      }
+    </tbody>
+  </table>
+</Layout>
+
+<script>
+  // Client-side search/sort/filter over the server-rendered rows.
+  const tbody = document.getElementById('rows')!;
+  const rows = Array.from(tbody.querySelectorAll<HTMLTableRowElement>('tr'));
+  const q = document.getElementById('q') as HTMLInputElement;
+  const sort = document.getElementById('sort') as HTMLSelectElement;
+  const year = document.getElementById('year') as HTMLSelectElement;
+  const shown = document.getElementById('shown')!;
+
+  const comparators: Record<string, (a: DOMStringMap, b: DOMStringMap) => number> = {
+    reviews: (a, b) => Number(b.reviews) - Number(a.reviews),
+    pct: (a, b) => Number(b.pct) - Number(a.pct) || Number(b.reviews) - Number(a.reviews),
+    release: (a, b) => (b.release ?? '').localeCompare(a.release ?? ''),
+    name: (a, b) => (a.name ?? '').localeCompare(b.name ?? ''),
+  };
+
+  function update() {
+    const term = q.value.trim().toLowerCase();
+    const y = year.value;
+    const sorted = [...rows].sort((a, b) => comparators[sort.value](a.dataset, b.dataset));
+    let visible = 0;
+    for (const row of sorted) {
+      const match =
+        (!term || row.dataset.name!.includes(term)) &&
+        (!y || row.dataset.release!.startsWith(y));
+      row.hidden = !match;
+      if (match) visible++;
+      tbody.appendChild(row); // re-appending moves the row into sorted order
+    }
+    shown.textContent = `Showing ${visible.toLocaleString()} of ${rows.length.toLocaleString()}`;
+  }
+
+  q.addEventListener('input', update);
+  sort.addEventListener('change', update);
+  year.addEventListener('change', update);
+  update();
+</script>
+
+<style>
+  .controls {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: center;
+    margin: 1.25rem 0;
+  }
+  input,
+  select {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--panel-2);
+    border-radius: 8px;
+    padding: 0.5rem 0.7rem;
+    font: inherit;
+  }
+  input {
+    flex: 1 1 260px;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.95rem;
+  }
+  th,
+  td {
+    text-align: left;
+    padding: 0.55rem 0.6rem;
+    border-bottom: 1px solid var(--panel-2);
+  }
+  th {
+    color: var(--muted);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    background: var(--bg);
+  }
+  td a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  td a:hover {
+    text-decoration: underline;
+  }
+  .num {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+  }
+  tbody tr:hover {
+    background: var(--panel);
+  }
+  @media (max-width: 640px) {
+    th:nth-child(4),
+    td:nth-child(4),
+    th:nth-child(5),
+    td:nth-child(5) {
+      display: none;
+    }
+  }
+</style>

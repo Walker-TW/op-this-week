@@ -1,0 +1,147 @@
+---
+import GameCard from './GameCard.astro';
+import { formatCount, formatDate, type ChangeReport } from '../lib/data';
+
+interface Props {
+  report: ChangeReport;
+}
+const { report } = Astro.props;
+
+const REASON_LABEL: Record<string, string> = {
+  delisted: 'Delisted',
+  score_fell: 'Score dropped',
+  reviews_removed: 'Too few reviews',
+  rating_changed_other: 'Rating changed',
+};
+---
+
+<section>
+  <h2>
+    New this week <span class="count">{report.new_entries.length}</span>
+  </h2>
+  {
+    report.new_entries.length === 0 ? (
+      <p class="muted">
+        {report.previous_week
+          ? 'No games joined the list this week.'
+          : 'This is the first week tracked, so there is nothing to compare against yet.'}
+      </p>
+    ) : (
+      <div class="grid">
+        {report.new_entries.map((g) => (
+          <GameCard game={g} />
+        ))}
+      </div>
+    )
+  }
+</section>
+
+<section>
+  <h2>
+    Dropped out <span class="count">{report.dropped.length}</span>
+  </h2>
+  {
+    report.dropped.length === 0 ? (
+      <p class="muted">No games left the list this week.</p>
+    ) : (
+      <ul class="dropped">
+        {report.dropped.map((d) => (
+          <li>
+            <div class="head">
+              <a href={d.before.store_url} target="_blank" rel="noopener">
+                {d.before.name}
+              </a>
+              <span class={`reason reason-${d.reason.code}`}>
+                {REASON_LABEL[d.reason.code] ?? d.reason.code}
+              </span>
+            </div>
+            <p>{d.reason.detail}</p>
+            {d.reason.summary && <p class="summary">{d.reason.summary}</p>}
+            <p class="muted small">
+              Was {d.before.percent_positive}% of {formatCount(d.before.review_count)} reviews
+              {d.now && (
+                <>
+                  {' '}
+                  → now {d.now.percent_positive}% of {formatCount(d.now.review_count)} (
+                  {d.now.review_label})
+                </>
+              )}
+            </p>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</section>
+
+{
+  report.previous_week && (
+    <p class="muted small compare">
+      Compared with the list from {formatDate(report.previous_week)}.
+    </p>
+  )
+}
+
+<style>
+  .count {
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--panel-2);
+    color: var(--muted);
+    padding: 0.15rem 0.6rem;
+    border-radius: 999px;
+    vertical-align: middle;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1rem;
+  }
+  .dropped {
+    list-style: none;
+    padding: 0;
+    display: grid;
+    gap: 0.75rem;
+  }
+  .dropped li {
+    background: var(--panel);
+    border-left: 4px solid var(--danger);
+    border-radius: var(--radius);
+    padding: 0.8rem 1rem;
+  }
+  .dropped p {
+    margin: 0.3rem 0 0;
+  }
+  .head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .head a {
+    color: var(--text);
+    font-weight: 700;
+  }
+  .reason {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.1rem 0.55rem;
+    border-radius: 999px;
+    background: #4a2420;
+    color: var(--danger);
+  }
+  .reason-delisted {
+    background: var(--panel-2);
+    color: var(--muted);
+  }
+  .summary {
+    font-style: italic;
+  }
+  .small {
+    font-size: 0.85rem;
+  }
+  .compare {
+    margin-top: 2rem;
+  }
+</style>

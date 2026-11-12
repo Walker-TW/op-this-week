@@ -1,0 +1,156 @@
+---
+import { url, USING_SAMPLE_DATA } from '../lib/data';
+
+interface Props {
+  title: string;
+  active?: 'week' | 'all' | 'archive';
+}
+const { title, active } = Astro.props;
+---
+
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="icon" type="image/svg+xml" href={url('favicon.svg')} />
+    <meta name="description" content="Steam games rated Overwhelmingly Positive, updated weekly." />
+    <title>{title} · OP This Week</title>
+  </head>
+  <body>
+    <header class="site-header">
+      <div class="wrap">
+        <a class="brand" href={url('/')}>OP <span>This Week</span></a>
+        <nav>
+          <a href={url('/')} aria-current={active === 'week' ? 'page' : undefined}>This week</a>
+          <a href={url('all/')} aria-current={active === 'all' ? 'page' : undefined}>All games</a>
+          <a href={url('weeks/')} aria-current={active === 'archive' ? 'page' : undefined}>
+            Past weeks
+          </a>
+        </nav>
+      </div>
+    </header>
+    {
+      USING_SAMPLE_DATA && (
+        <p class="sample-banner">
+          Showing sample data. Real data appears after the first weekly run.
+        </p>
+      )
+    }
+    <main class="wrap">
+      <slot />
+    </main>
+    <footer class="wrap site-footer">
+      Data from Steam's store API and SteamSpy. "Overwhelmingly Positive" means 95%+ positive
+      from 500+ reviews. Not affiliated with Valve.
+    </footer>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #11151c;
+    --panel: #1a202b;
+    --panel-2: #222a38;
+    --text: #e6e9ef;
+    --muted: #9aa4b5;
+    --accent: #5fd38d;
+    --accent-dim: #2e6b47;
+    --danger: #f07a6a;
+    --warn: #e8c15a;
+    --radius: 10px;
+    color-scheme: dark;
+  }
+  * {
+    box-sizing: border-box;
+  }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font: 16px/1.5 system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  }
+  a {
+    color: var(--accent);
+  }
+  .wrap {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 1.25rem;
+  }
+  h1,
+  h2 {
+    line-height: 1.2;
+  }
+  h2 {
+    margin-top: 2.5rem;
+  }
+  .muted {
+    color: var(--muted);
+  }
+  .site-header {
+    background: var(--panel);
+    border-bottom: 1px solid var(--panel-2);
+  }
+  .site-header .wrap {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    padding-block: 0.9rem;
+  }
+  .brand {
+    font-weight: 800;
+    font-size: 1.25rem;
+    color: var(--accent);
+    text-decoration: none;
+  }
+  .brand span {
+    color: var(--text);
+    font-weight: 600;
+  }
+  nav {
+    display: flex;
+    gap: 1.25rem;
+  }
+  nav a {
+    color: var(--muted);
+    text-decoration: none;
+  }
+  nav a:hover,
+  nav a[aria-current='page'] {
+    color: var(--text);
+  }
+  nav a[aria-current='page'] {
+    border-bottom: 2px solid var(--accent);
+  }
+  .sample-banner {
+    margin: 0;
+    padding: 0.5rem 1.25rem;
+    text-align: center;
+    background: #3a3214;
+    color: var(--warn);
+    font-size: 0.9rem;
+  }
+  .site-footer {
+    margin-top: 4rem;
+    padding-block: 2rem;
+    border-top: 1px solid var(--panel-2);
+    color: var(--muted);
+    font-size: 0.85rem;
+  }
+  .badge {
+    display: inline-block;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+    background: var(--accent-dim);
+    color: #d9ffe8;
+    white-space: nowrap;
+  }
+  .pct {
+    font-weight: 700;
+    color: var(--accent);
+  }
+</style>

@@ -1,0 +1,93 @@
+name: Weekly update
+
+on:
+  schedule:
+    - cron: "0 6 * * 1" # Mondays 06:00 UTC
+  workflow_dispatch:
+    inputs:
+      skip_pipeline:
+        description: "Only rebuild and deploy the site (don't fetch new Steam data)"
+        type: boolean
+        default: false
+  push:
+    branches: [main]
+    paths: ["site/**", ".github/workflows/weekly.yml"]
+
+concurrency:
+  group: weekly-update
+  cancel-in-progress: false
+
+jobs:
+  update-data:
+    # Runs on the schedule and on manual runs (unless skipped); site-only pushes skip it.
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && !inputs.skip_pipeline)
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Run pipeline
+        working-directory: pipeline
+        run: |
+          uv sync --frozen
+          uv run pytest -q
+          uv run python -m op_tracker.main
+
+      - name: Commit data
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data
+          if git diff --cached --quiet; then
+            echo "No data changes."
+          else
+            git commit -m "Weekly data update $(date -u +%F)"
+            git push
+          fi
+
+  build-deploy:
+    needs: update-data
+    # Deploy after a successful data update, or when the data step was skipped on purpose.
+    if: always() && (needs.update-data.result == 'success' || needs.update-data.result == 'skipped')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }} # picks up the data commit made by the previous job
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: site/package-lock.json
+
+      - id: pages
+        uses: actions/configure-pages@v5
+
+      - name: Build site
+        working-directory: site
+        env:
+          SITE_URL: ${{ steps.pages.outputs.origin }}
+          BASE_PATH: ${{ steps.pages.outputs.base_path }}
+        run: |
+          npm ci
+          npx astro check
+          npm run build
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site/dist
+
+      - id: deploy
+        uses: actions/deploy-pages@v4

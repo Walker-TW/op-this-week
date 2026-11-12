@@ -1,0 +1,38 @@
+---
+import Layout from '../layouts/Layout.astro';
+import ChangeReport from '../components/ChangeReport.astro';
+import { formatCount, formatDate, getCurrent, getLatestChanges, url } from '../lib/data';
+
+const current = getCurrent();
+const changes = getLatestChanges();
+---
+
+<Layout title="This week" active="week">
+  {
+    !current || !changes ? (
+      <>
+        <h1>No data yet</h1>
+        <p class="muted">The weekly job hasn't run yet. Check back after its first run.</p>
+      </>
+    ) : (
+      <>
+        <h1>Week of {formatDate(changes.week)}</h1>
+        <p class="lead">
+          <strong>{formatCount(current.count)}</strong> games on Steam are currently rated{' '}
+          <span class="pct">Overwhelmingly Positive</span>. <a href={url('all/')}>Browse them all →</a>
+        </p>
+        <ChangeReport report={changes} />
+      </>
+    )
+  }
+</Layout>
+
+<style>
+  .lead {
+    font-size: 1.1rem;
+    color: var(--muted);
+  }
+  .lead strong {
+    color: var(--text);
+  }
+</style>

@@ -1,0 +1,76 @@
+---
+import { formatCount, formatDate, type Game } from '../lib/data';
+
+interface Props {
+  game: Game;
+}
+const { game } = Astro.props;
+---
+
+<article class="card">
+  <a href={game.store_url} target="_blank" rel="noopener">
+    {
+      game.header_image ? (
+        <img src={game.header_image} alt="" loading="lazy" width="460" height="215" />
+      ) : (
+        <div class="placeholder" />
+      )
+    }
+  </a>
+  <div class="body">
+    <h3><a href={game.store_url} target="_blank" rel="noopener">{game.name}</a></h3>
+    <p class="stats">
+      <span class="pct">{game.percent_positive}%</span> positive ·
+      {formatCount(game.review_count)} reviews
+    </p>
+    <p class="meta">
+      Released {formatDate(game.release_date)}
+      {game.price && <> · {game.price}</>}
+      {game.is_new_release && <span class="badge">New release</span>}
+    </p>
+  </div>
+</article>
+
+<style>
+  .card {
+    background: var(--panel);
+    border-radius: var(--radius);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+  img,
+  .placeholder {
+    display: block;
+    width: 100%;
+    height: auto;
+    aspect-ratio: 460 / 215;
+    object-fit: cover;
+    background: var(--panel-2);
+  }
+  .body {
+    padding: 0.8rem 1rem 1rem;
+  }
+  h3 {
+    margin: 0 0 0.35rem;
+    font-size: 1.05rem;
+  }
+  h3 a {
+    color: var(--text);
+    text-decoration: none;
+  }
+  h3 a:hover {
+    text-decoration: underline;
+  }
+  p {
+    margin: 0.15rem 0;
+  }
+  .meta {
+    color: var(--muted);
+    font-size: 0.85rem;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.4rem;
+    align-items: center;
+  }
+</style>

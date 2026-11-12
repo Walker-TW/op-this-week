@@ -1,0 +1,34 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import { formatDate, getAllChanges, url } from '../../lib/data';
+
+const reports = getAllChanges();
+---
+
+<Layout title="Past weeks" active="archive">
+  <h1>Past weeks</h1>
+  {
+    reports.length === 0 ? (
+      <p class="muted">No weekly reports yet.</p>
+    ) : (
+      <ul>
+        {reports.map((r) => (
+          <li>
+            <a href={url(`weeks/${r.week}/`)}>{formatDate(r.week)}</a>
+            <span class="muted">
+              {' '}
+              · +{r.new_entries.length} new, −{r.dropped.length} dropped · {r.total} total
+            </span>
+          </li>
+        ))}
+      </ul>
+    )
+  }
+</Layout>
+
+<style>
+  ul {
+    padding-left: 1.2rem;
+    line-height: 2;
+  }
+</style>
